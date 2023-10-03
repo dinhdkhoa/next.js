@@ -1,10 +1,11 @@
 import Image from "next/image"
-import styles from "./page.module.css"
+
 import Link from "next/link"
+import AppTable from "@/components/Table"
 
 export default function Home() {
   return (
-    <main className={styles.main}>
+    <main>
       <ul>
         <li>
           <Link href="/facebook">Facebook</Link>
@@ -16,6 +17,7 @@ export default function Home() {
           <Link href="/youtube">Youtube</Link>
         </li>
       </ul>
+      <AppTable />
     </main>
   )
 }
