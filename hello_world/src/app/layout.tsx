@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import Header from "@/components/Header"
 import Container from "react-bootstrap/Container"
 import Footer from "@/components/Footer"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Header />
         <Container>{children}</Container>
+        <Toaster position="bottom-right" richColors expand />
         <Footer />
       </body>
     </html>

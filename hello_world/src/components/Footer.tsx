@@ -4,7 +4,8 @@ export default function Footer() {
       style={{
         background: "#ddd",
         textAlign: "center",
-        padding: "5px 0"
+        padding: "5px 0",
+        marginTop: "20px"
       }}
     >
       Next.JS v13 Starter
