@@ -5,6 +5,7 @@ import TableSkeleton from "./TableSkeleton"
 import useSWR, { mutate } from "swr"
 import CreateModal from "./Modal"
 import { toast } from "sonner"
+import Link from "next/link"
 
 const fetcher: (url: string) => Promise<any> = (url: string) =>
   fetch(url).then((res) => res.json())
@@ -76,7 +77,13 @@ export default function AppTable() {
                   <td>{blog.title}</td>
                   <td>{blog.author}</td>
                   <td>
-                    <Button>View</Button>
+                    <Link
+                      className="btn btn-primary"
+                      href={`/blogs/${blog.id}`}
+                    >
+                      View
+                    </Link>
+
                     <CreateModal mode="edit" blog={blog} />
                     <Button
                       variant="danger"
