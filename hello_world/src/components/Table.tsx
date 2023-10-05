@@ -40,7 +40,7 @@ export default function AppTable() {
   const handleDelete = async (id: number) => {
     try {
       await deleteAPI(id)
-      toast.success("Blog deleted successfully")
+      toast.success("Blog deleted successfully.")
     } catch (error) {
       console.error("Error deleting form:", error)
       toast.error("An error occurred while deleting the form")

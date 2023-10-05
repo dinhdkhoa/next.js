@@ -22,27 +22,32 @@ const postAPI = (postBody: FormData) => {
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify(postBody)
+    }).then((res) => {
+      if (res.ok) {
+        toast.success("Blog added successfully.")
+        mutate("http://localhost:8000/blogs")
+      }
     })
-      .then((res) => res.json())
-      .then((res) => mutate("http://localhost:8000/blogs"))
   } catch (error) {
+    toast.error("An error occurred while submitting the form")
     console.log(error)
   }
 }
 const putAPI = (postBody: FormData, id: number) => {
   try {
-    fetch(`http://localhost:8000/blogs${id}`, {
+    fetch(`http://localhost:8000/blogs/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: JSON.stringify(postBody)
-    })
-      .then((res) => res.json())
-      .then((res) => {
+    }).then((res) => {
+      if (res.ok) {
+        toast.success("Blog edited successfully.")
         mutate("http://localhost:8000/blogs")
-      })
+      }
+    })
   } catch (error) {
     console.log(error)
   }
@@ -81,19 +86,10 @@ function CreateModal({ mode, blog }: PropsType) {
         return
       }
     }
-    try {
-      if (mode == "add") {
-        await postAPI(formData)
-      } else {
-        await putAPI(formData, blog?.id as number)
-      }
-      toast.success("Form submitted successfully")
-    } catch (error) {
-      console.error("Error submitting form:", error)
-      if (mode == "edit") {
-        setFormData({ ...blog } as FormData)
-      }
-      toast.error("An error occurred while submitting the form")
+    if (mode == "add") {
+      await postAPI(formData)
+    } else {
+      await putAPI(formData, blog?.id as number)
     }
     handleClose()
   }
