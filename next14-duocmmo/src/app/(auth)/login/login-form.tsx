@@ -16,8 +16,10 @@ import { Input } from "@/components/ui/input"
 import envConfig from "@/config"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
 import { toast } from "sonner"
+import { useAppContext } from "@/app/app-provider"
 
 export function LoginForm() {
+  const {setSessionToken} = useAppContext()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -47,19 +49,35 @@ export function LoginForm() {
       if (!resp.ok) {
         throw data
       }
+      const respFromNextServer = await fetch(`api/auth`, {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data),
+        method: "POST"
+      })
+
+      if (respFromNextServer) {
+        const payload = await respFromNextServer.json()
+        setSessionToken(payload.data.token)
+      }
       toast.success(data.payload.message)
+      
       return data
     } catch (error: any) {
-      const errorsList = error.payload.errors as {
+      console.log(error)
+      const errorsList = error?.payload?.errors as {
         field: "email" | "password"
         message: string
       }[]
-      errorsList.forEach((err) => {
-        form.setError(err.field, {
-          type: "server",
-          message: err.message
+      if (errorsList && errorsList.length > 0) {
+        errorsList.forEach((err) => {
+          form.setError(err.field, {
+            type: "server",
+            message: err.message
+          })
         })
-      })
+      }
     }
   }
 
