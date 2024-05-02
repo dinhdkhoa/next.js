@@ -1,11 +1,11 @@
+import Header from "@/components/header"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import Header from "@/components/header"
-import { Toaster } from "@/components/ui/sonner"
-import AppProvider from "./app-provider"
 import { cookies } from "next/headers"
+import SeTSeesionToken from "./app-provider"
+import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -31,10 +31,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AppProvider initialSessionToken={sessionToken}>
+          <SeTSeesionToken initialSessionToken={sessionToken}>
             <Header />
             {children}
-          </AppProvider>
+          </SeTSeesionToken>
         </ThemeProvider>
       </body>
     </html>

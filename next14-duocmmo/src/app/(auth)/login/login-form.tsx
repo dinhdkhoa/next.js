@@ -13,13 +13,15 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import envConfig from "@/config"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
 import { toast } from "sonner"
-import { useAppContext } from "@/app/app-provider"
+import loginAPI from "./login.api"
+import { useRouter } from "next/navigation"
+import { clientSessionToken } from "@/lib/https"
 
 export function LoginForm() {
-  const {setSessionToken} = useAppContext()
+  const sessionToken = clientSessionToken.value
+  const router = useRouter()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -31,41 +33,13 @@ export function LoginForm() {
   // 2. Define a submit handler.
   async function onSubmit(values: LoginBodyType) {
     try {
-      const resp = await fetch(
-        `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`,
-        {
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(values),
-          method: "POST"
-        }
-      )
-      const payload = await resp.json()
-      const data = {
-        status: resp.status,
-        payload
-      }
-      if (!resp.ok) {
-        throw data
-      }
-      const respFromNextServer = await fetch(`api/auth`, {
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data),
-        method: "POST"
-      })
+      const resp = await loginAPI.login(values)
+      toast.success(resp.payload.message)
 
-      if (respFromNextServer) {
-        const payload = await respFromNextServer.json()
-        setSessionToken(payload.data.token)
-      }
-      toast.success(data.payload.message)
-      
-      return data
+      await loginAPI.setToken({sessionToken: resp.payload.data.token})
+
+      router.push('/me')
     } catch (error: any) {
-      console.log(error)
       const errorsList = error?.payload?.errors as {
         field: "email" | "password"
         message: string

@@ -1,11 +1,19 @@
-'use client'
-import { useAppContext } from '@/app/app-provider'
-import React from 'react'
-
+"use client"
+import { useEffect } from "react"
+import meAPI from "./me.api"
+import { clientSessionToken } from "@/lib/https"
 
 export default function Profile() {
-   const {sessionToken} = useAppContext()
+
+  useEffect(() => {
+    const callAPI = async () => {
+      const result = await meAPI.meClient()
+    }
+    callAPI()
+  }, [])
   return (
-    <div>Profile</div>
+    <div>
+      Client Component ${clientSessionToken.value}
+    </div>
   )
 }

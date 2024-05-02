@@ -13,11 +13,13 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import envConfig from "@/config"
 import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema"
 import { toast } from "sonner"
+import registerAPI from "./register.api"
+import { useRouter } from "next/navigation"
 
 export function RegisterForm() {
+  const router = useRouter()
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
     defaultValues: {
@@ -31,26 +33,9 @@ export function RegisterForm() {
   // 2. Define a submit handler.
   async function onSubmit(values: RegisterBodyType) {
     try {
-      const resp = await fetch(
-        `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/register`,
-        {
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(values),
-          method: "POST"
-        }
-      )
-      const payload = await resp.json()
-      const data = {
-        status: resp.status,
-        payload
-      }
-      if (!resp.ok) {
-        throw data
-      }
-      toast.success(data.payload.message)
-      return data
+      const resp = await registerAPI.register(values)
+      toast.success(resp.payload.message)
+      router.push("/login")
     } catch (error) {
       console.error(error)
     }
