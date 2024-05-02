@@ -13,14 +13,15 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { handleApiError } from "@/lib/utils"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import loginAPI from "./login.api"
-import { useRouter } from "next/navigation"
-import { clientSessionToken } from "@/lib/https"
+import { useState } from "react"
 
 export function LoginForm() {
-  const sessionToken = clientSessionToken.value
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -32,6 +33,8 @@ export function LoginForm() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: LoginBodyType) {
+    if (isLoading) return
+    setIsLoading(true)
     try {
       const resp = await loginAPI.login(values)
       toast.success(resp.payload.message)
@@ -40,18 +43,9 @@ export function LoginForm() {
 
       router.push('/me')
     } catch (error: any) {
-      const errorsList = error?.payload?.errors as {
-        field: "email" | "password"
-        message: string
-      }[]
-      if (errorsList && errorsList.length > 0) {
-        errorsList.forEach((err) => {
-          form.setError(err.field, {
-            type: "server",
-            message: err.message
-          })
-        })
-      }
+      handleApiError(error, form.setError)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -91,7 +85,7 @@ export function LoginForm() {
           )}
         />
 
-        <Button type="submit" className="!mt-8 w-full">
+        <Button type="submit" className="!mt-8 w-full" disabled={isLoading}>
           Login
         </Button>
       </form>

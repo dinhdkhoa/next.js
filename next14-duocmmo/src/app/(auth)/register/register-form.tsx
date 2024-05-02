@@ -17,8 +17,11 @@ import { RegisterBody, RegisterBodyType } from "@/schemaValidations/auth.schema"
 import { toast } from "sonner"
 import registerAPI from "./register.api"
 import { useRouter } from "next/navigation"
+import { handleApiError } from "@/lib/utils"
+import { useState } from "react"
 
 export function RegisterForm() {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
@@ -32,12 +35,16 @@ export function RegisterForm() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: RegisterBodyType) {
+     if (isLoading) return
+     setIsLoading(true)
     try {
       const resp = await registerAPI.register(values)
       toast.success(resp.payload.message)
       router.push("/login")
     } catch (error) {
-      console.error(error)
+      handleApiError(error, form.setError)
+    } finally {
+      setIsLoading(false)
     }
   }
 
