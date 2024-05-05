@@ -1,9 +1,11 @@
 import envConfig from "@/config"
 import { LoginResType } from "@/schemaValidations/auth.schema"
+import { json } from "stream/consumers"
 
 type CustomRequest = RequestInit & { baseUrl?: string | undefined }
 
 const FORM_ERROR_STATUS = 422
+const UNAUTHORIZED_ERROR_STATUS = 401
 
 type FormErrorPayload = {
     message: string,
@@ -45,7 +47,7 @@ class SessionToken {
     }
     set value(token: string) {
         // Nếu gọi method này ở server thì sẽ bị lỗi
-        if (typeof window === 'undefined') {
+        if (!isClient()) {
             throw new Error('Cannot set token on server side')
         }
         this.token = token
@@ -82,8 +84,6 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
         body,
         method
     })
-    console.log(res)
-
 
     const payload: ResponseType = await res.json()
 
@@ -99,12 +99,14 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
                 status: 422,
                 payload: data.payload as FormErrorPayload
             })
+        } else if (res.status == UNAUTHORIZED_ERROR_STATUS) {
+            handleUnthorizedResponse(baseHeader)
         } else {
             throw new HttpError(data)
         }
     }
 
-    if(typeof window !== undefined){
+    if(isClient()){
         if (url === 'auth/login' || url === 'auth/register') {
             clientSessionToken.value = (payload as LoginResType).data.token;
         } else if (url === 'auth/logout') {
@@ -113,6 +115,27 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     }
 
     return data
+}
+
+const isClient = (): boolean => {
+    return typeof window !== 'undefined'
+}
+
+const handleUnthorizedResponse = async (baseHeader: HeadersInit | undefined) => {
+    if(isClient()){
+        await fetch('api/auth/logout', 
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    sessionExpired: true
+                }),
+                headers: {
+                    ...baseHeader
+                }
+            }
+        )
+        clientSessionToken.value = '';
+    }
 }
 
 const http = {
