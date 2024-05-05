@@ -1,5 +1,3 @@
-import React from "react"
-import { LoginForm } from "./login-form"
 import {
   Card,
   CardContent,
@@ -7,6 +5,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
+import { LoginForm } from "./login-form"
 
 export default function Login() {
   return (

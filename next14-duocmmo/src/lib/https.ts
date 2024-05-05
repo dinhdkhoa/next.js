@@ -1,6 +1,7 @@
 import envConfig from "@/config"
 import { LoginResType } from "@/schemaValidations/auth.schema"
-import { json } from "stream/consumers"
+import { RedirectType, redirect } from "next/navigation"
+import { toast } from "sonner"
 
 type CustomRequest = RequestInit & { baseUrl?: string | undefined }
 
@@ -62,7 +63,7 @@ export const clientSessionToken = new SessionToken()
 
 const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomRequest | undefined) => {
     const body = options?.body ? JSON.stringify(options.body) : undefined
-
+    
     const baseHeader = {
         'Content-Type': 'application/json',
         Authorization: clientSessionToken.value
@@ -122,7 +123,7 @@ const isClient = (): boolean => {
 }
 
 const handleUnthorizedResponse = async (baseHeader: HeadersInit | undefined) => {
-    if(isClient()){
+    if(isClient()){ // handle 401 on client
         await fetch('api/auth/logout', 
             {
                 method: 'POST',
@@ -135,6 +136,11 @@ const handleUnthorizedResponse = async (baseHeader: HeadersInit | undefined) => 
             }
         )
         clientSessionToken.value = '';
+        location.href = '/login?sessionExpired=true'
+    } else { // handle 401 on next server
+        console.log('server logout')
+        // redirect('/logout');
+        // const sessionToken = (baseHeader as any)?.Authorization.split('Bearer ').pop()
     }
 }
 

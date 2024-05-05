@@ -15,10 +15,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { handleApiError } from "@/lib/utils"
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import loginAPI from "./login.api"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -30,6 +30,13 @@ export function LoginForm() {
       email: ""
     }
   })
+  const params = useSearchParams()
+
+    useEffect(() => {
+      if (params.get("sessionExpired")) {
+        toast.error("Expired Session")
+      }
+    }, [])
 
   // 2. Define a submit handler.
   async function onSubmit(values: LoginBodyType) {
