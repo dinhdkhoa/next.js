@@ -155,6 +155,7 @@ const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefi
             }
         )
         clientSessionToken.value = '';
+        clientSessionToken.expiresAt = '';
         location.href = '/login?sessionExpired=true'
 }
 

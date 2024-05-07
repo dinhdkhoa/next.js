@@ -2,7 +2,7 @@ import http from "@/lib/https";
 import { LoginBodyType, LoginResType, SlideSessionResType } from "@/schemaValidations/auth.schema";
 
 const slideSessionAPI = {
-    slideSession: (sessionToken: string) => http.post<SlideSessionResType>('auth/slide-session1', {}, {
+    slideSession: (sessionToken: string) => http.post<SlideSessionResType>('auth/slide-session', {}, {
         headers: {
             Authorization: `Bearer ${sessionToken}`
         }

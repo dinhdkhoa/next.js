@@ -46,7 +46,7 @@ export function LoginForm() {
       const resp = await loginAPI.login(values)
       toast.success(resp.payload.message)
 
-      await loginAPI.setToken({sessionToken: resp.payload.data.token})
+      await loginAPI.setToken({sessionToken: resp.payload.data.token, expiresAt: resp.payload.data.expiresAt})
 
       router.push('/me')
     } catch (error: any) {
