@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge"
 import { FormError, HttpError } from "./https"
 import { UseFormSetError } from "react-hook-form"
 import { toast } from "sonner"
+import jwt from 'jsonwebtoken'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -25,4 +26,8 @@ export const handleApiError = (error: unknown, setError?: UseFormSetError<any>, 
       duration
     })
   }
+}
+
+export const decodeJWT = <Payload>(token: string) => {
+  return jwt.decode(token) as Payload
 }

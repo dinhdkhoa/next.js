@@ -10,8 +10,8 @@ export default async function MeProfile() {
   return (
     <div>
       <h1>Profile</h1>
-      {/* <div>Xin chào {result.payload.data.name} ${sessionToken?.value}</div> */}
-      {/* <Profile /> */}
+      <div>Xin chào {result.payload.data.name} ${sessionToken?.value}</div>
+      <Profile />
     </div>
   )
 }

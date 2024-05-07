@@ -101,7 +101,12 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
                 payload: data.payload as FormErrorPayload
             })
         } else if (res.status == UNAUTHORIZED_ERROR_STATUS) {
-            handleUnthorizedResponse(baseHeader)
+            if (isClient()) {
+                await handleUnthorizedResponseOnClient(baseHeader)
+            } else {
+                const paramSessionToken = (options?.headers as any)?.Authorization.split('Bearer ').pop() as string
+                redirect(`/logout?sessionToken=${paramSessionToken}`)
+            }
         } else {
             throw new HttpError(data)
         }
@@ -122,8 +127,8 @@ const isClient = (): boolean => {
     return typeof window !== 'undefined'
 }
 
-const handleUnthorizedResponse = async (baseHeader: HeadersInit | undefined) => {
-    if(isClient()){ // handle 401 on client
+const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefined) : Promise<void | string> => {
+   // handle 401 on client
         await fetch('api/auth/logout', 
             {
                 method: 'POST',
@@ -137,11 +142,6 @@ const handleUnthorizedResponse = async (baseHeader: HeadersInit | undefined) => 
         )
         clientSessionToken.value = '';
         location.href = '/login?sessionExpired=true'
-    } else { // handle 401 on next server
-        console.log('server logout')
-        // redirect('/logout');
-        // const sessionToken = (baseHeader as any)?.Authorization.split('Bearer ').pop()
-    }
 }
 
 const http = {
