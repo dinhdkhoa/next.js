@@ -6,6 +6,7 @@ import { Inter } from "next/font/google"
 import { cookies } from "next/headers"
 import SeTSeesionToken from "./app-provider"
 import "./globals.css"
+import SlideSession from "@/components/slide-session"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -34,6 +35,7 @@ export default function RootLayout({
           <SeTSeesionToken initialSessionToken={sessionToken}>
             <Header />
             {children}
+            <SlideSession />
           </SeTSeesionToken>
         </ThemeProvider>
       </body>

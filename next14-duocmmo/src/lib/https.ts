@@ -43,7 +43,8 @@ export class FormError extends HttpError {
 
 class SessionToken {
     private token = ''
-    get value() {
+    private _expiresAt = ''
+    get value() { 
         return this.token
     }
     set value(token: string) {
@@ -53,6 +54,17 @@ class SessionToken {
         }
         this.token = token
     }
+
+    get expiresAt() {
+        return this._expiresAt
+    }
+    set expiresAt(expireAt: string) {
+        // Nếu gọi method này ở server thì sẽ bị lỗi
+        if (!isClient()) {
+            throw new Error('Cannot set _expiresAt on server side')
+        }
+        this._expiresAt = expireAt
+ }
 
 }
 /**
@@ -115,8 +127,10 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     if(isClient()){
         if (url === 'auth/login' || url === 'auth/register') {
             clientSessionToken.value = (payload as LoginResType).data.token;
+            clientSessionToken.expiresAt = (payload as LoginResType).data.expiresAt;
         } else if (url === 'auth/logout') {
             clientSessionToken.value = '';
+            clientSessionToken.expiresAt = new Date().toUTCString()
         }
     }
 
