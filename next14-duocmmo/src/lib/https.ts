@@ -74,9 +74,13 @@ class SessionToken {
 export const clientSessionToken = new SessionToken()
 
 const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomRequest | undefined) => {
-    const body = options?.body ? JSON.stringify(options.body) : undefined
+    const body = options?.body ? (isFormData(options.body) ? options.body : JSON.stringify(options.body)) : undefined
     
-    const baseHeader = {
+    const baseHeader = isFormData(body) ? {
+        Authorization: clientSessionToken.value
+            ? `Bearer ${clientSessionToken.value}`
+            : ''
+    } : {
         'Content-Type': 'application/json',
         Authorization: clientSessionToken.value
             ? `Bearer ${clientSessionToken.value}`
@@ -91,7 +95,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     const res = await fetch(fullURL, {
         ...options,
         headers: {
-            ...baseHeader,
+            ...baseHeader as any,
             ...options?.headers,
         },
         body,
@@ -114,7 +118,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
             })
         } else if (res.status == UNAUTHORIZED_ERROR_STATUS) {
             if (isClient()) {
-                await handleUnthorizedResponseOnClient(baseHeader)
+                await handleUnthorizedResponseOnClient(baseHeader as any)
             } else {
                 const paramSessionToken = (options?.headers as any)?.Authorization.split('Bearer ').pop() as string
                 redirect(`/logout?sessionToken=${paramSessionToken}`)
@@ -139,6 +143,10 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
 
 const isClient = (): boolean => {
     return typeof window !== 'undefined'
+}
+
+const isFormData = (body: BodyInit | null | undefined ) => {
+    return body && body instanceof FormData
 }
 
 const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefined) : Promise<void | string> => {

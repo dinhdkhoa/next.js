@@ -8,18 +8,23 @@ export default function Header() {
 
   return (
     <nav className="flex w-full">
-      <ul className="inline">
+      <ul className="flex gap-3">
+        <li>
+          <Link href={"/products"}>Products</Link>
+        </li>
+        <li>
+          <Link href={"/me"}>Me</Link>
+        </li>
         <li>
           <Link href={"/register"}>Register</Link>
         </li>
         <li>
           <Link href={"/login"}>Login</Link>
         </li>
-       
+
         <li>
           <ButtonLogout />
         </li>
-        
       </ul>
       <ModeToggle />
     </nav>

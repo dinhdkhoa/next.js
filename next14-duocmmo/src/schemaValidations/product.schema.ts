@@ -2,7 +2,7 @@ import z from 'zod'
 
 export const CreateProductBody = z.object({
   name: z.string().min(1).max(256),
-  price: z.number().positive(),
+  price: z.coerce.number().positive(),
   description: z.string().max(10000),
   image: z.string().url()
 })
@@ -32,6 +32,7 @@ export const ProductListRes = z.object({
 })
 
 export type ProductListResType = z.TypeOf<typeof ProductListRes>
+export type ProductDetailType = z.TypeOf<typeof ProductSchema>
 
 export const UpdateProductBody = CreateProductBody
 export type UpdateProductBodyType = CreateProductBodyType
