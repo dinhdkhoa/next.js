@@ -14,29 +14,61 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { handleApiError } from "@/lib/utils"
-import { CreateProductBody, CreateProductBodyType } from "@/schemaValidations/product.schema"
+import { CreateProductBody, CreateProductBodyType, ProductDetailType } from "@/schemaValidations/product.schema"
 import Image from "next/image"
 import { useRef, useState } from "react"
 import { toast } from "sonner"
 import addProductsAPI from "../products.api"
 
-export function AddProductForm() {
+export function ProductForm({product}: { product?: ProductDetailType }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const form = useForm<CreateProductBodyType>({
     resolver: zodResolver(CreateProductBody),
     defaultValues: {
-      name: "",
-      price:0,
-      description: '',
-      image: ''
+      name: product?.name ?? "",
+      price: product?.price ?? 0,
+      description: product?.description ?? "",
+      image: product?.image ??  ""
     }
   })
-
+  const image = form.watch('image')
   // 2. Define a submit handler.
   async function onSubmit(values: CreateProductBodyType) {
     if (isLoading) return
+    if(product){
+      await updateProduct(values)
+    } else {
+      await addProduct(values)
+    }
+  }
+
+  const updateProduct =  async (values: CreateProductBodyType) => {
+    if(!product) return
+    setIsLoading(true)
+    const _values = {
+      ...values
+    }
+    try {
+      if(file){
+        const formData = new FormData()
+        formData.append("file", file as Blob)
+        const resp = await addProductsAPI.uploadImage(formData)
+        toast.success(resp.payload.message)
+        _values.image = resp.payload.data
+      }
+      const updateProduct = await addProductsAPI.updateProduct(product?.id,{
+        ..._values,
+      })
+      toast.success(updateProduct.payload.message)
+    } catch (error) {
+      handleApiError(error, form.setError)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  const addProduct = async (values: CreateProductBodyType) => {
     setIsLoading(true)
     try {
       const formData = new FormData()
@@ -55,7 +87,6 @@ export function AddProductForm() {
       setIsLoading(false)
     }
   }
-
   return (
     <Form {...form}>
       <form
@@ -135,10 +166,10 @@ export function AddProductForm() {
             </FormItem>
           )}
         />
-        {file && (
+        {(file || image) && (
           <>
             <Image
-              src={URL.createObjectURL(file)}
+              src={file ? URL.createObjectURL(file) : image}
               width={128}
               height={128}
               alt="Product Image"
@@ -161,7 +192,7 @@ export function AddProductForm() {
           </>
         )}
         <Button type="submit" className="!mt-8 w-full" disabled={isLoading}>
-          Add Product
+          {product ? "Update Product" : "Add Product"}
         </Button>
       </form>
     </Form>

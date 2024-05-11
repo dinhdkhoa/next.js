@@ -170,7 +170,7 @@ const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefi
 const http = {
     get: <T>(url: string, options?: Omit<CustomRequest, 'body'>) => request<T>('GET', url, { ...options }),
     post: <T>(url: string, body: any, options?: Omit<CustomRequest, 'body'>) => request<T>('POST', url, { ...options, body }),
-    put: <T>(url: string, body: any, options?: Omit<CustomRequest, 'body'>) => request<T>('GET', url, { ...options, body }),
-    delete: <T>(url: string, body: any, options?: Omit<CustomRequest, 'body'>) => request<T>('GET', url, { ...options, body })
+    put: <T>(url: string, body: any, options?: Omit<CustomRequest, 'body'>) => request<T>('PUT', url, { ...options, body }),
+    delete: <T>(url: string, body: any, options?: Omit<CustomRequest, 'body'>) => request<T>('DELETE', url, { ...options, body })
 }
 export default http

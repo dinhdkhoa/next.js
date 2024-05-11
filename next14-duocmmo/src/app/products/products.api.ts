@@ -9,8 +9,9 @@ const addProductsAPI = {
             message: string
             data: string
         }>('/media/upload', body),
-    getProductList: () => http.get<ProductListResType>('products'),
-    getProductDetail: (id: string) => http.get<ProductResType>(`products/${id}`),
+    getProductList: () => http.get<ProductListResType>('products', { cache: "no-cache" }),
+    getProductDetail: (id: string) => http.get<ProductResType>(`products/${id}`, { cache: "no-cache" }),
+    updateProduct: (id: number, body: CreateProductBodyType) => http.put<ProductResType>(`products/${id}`, body),
     
 }
 

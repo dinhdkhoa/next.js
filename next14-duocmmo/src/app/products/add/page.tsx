@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { AddProductForm } from "./add-product-form"
+import { ProductForm } from "../_components/product-form"
 
 export default function Register() {
   return (
@@ -16,7 +16,7 @@ export default function Register() {
           <CardDescription>Enter Info To Add New Products</CardDescription>
         </CardHeader>
         <CardContent>
-          <AddProductForm />
+          <ProductForm />
         </CardContent>
       </Card>
     </div>

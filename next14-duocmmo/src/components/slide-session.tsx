@@ -10,22 +10,22 @@ export default function SlideSession() {
   const router = useRouter()
 
   useEffect(() => {
-    // const interval = setInterval(async () => {
-    //   const currentTime = new Date()
-    //   const expiresTime = new Date(clientSessionToken.expiresAt)
-    //   if (differenceInHours(expiresTime, currentTime) < 1) {
-    //     try {
-    //       const result = await slideSessionAPI.slideSessionClient()
-    //       if (result) {
-    //         clientSessionToken.expiresAt = result.payload.data.expiresAt
-    //       }
-    //     } catch (error) {
-    //       router.push("/login?sessionExpired=true")
-    //     }
-    //   }
-    // }, 1000 * 60 * 60)
+    const interval = setInterval(async () => {
+      const currentTime = new Date()
+      const expiresTime = new Date(clientSessionToken.expiresAt)
+      if (differenceInHours(expiresTime, currentTime) < 1) {
+        try {
+          const result = await slideSessionAPI.slideSessionClient()
+          if (result) {
+            clientSessionToken.expiresAt = result.payload.data.expiresAt
+          }
+        } catch (error) {
+          router.push("/login?sessionExpired=true")
+        }
+      }
+    }, 1000 * 60 * 60)
 
-    // return () => clearInterval(interval)
+    return () => clearInterval(interval)
   }, [])
   return null
 }

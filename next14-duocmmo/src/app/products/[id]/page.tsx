@@ -11,6 +11,7 @@ import {
 import { ProductDetailType, ProductResType } from '@/schemaValidations/product.schema'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import { ProductForm } from '../_components/product-form'
 
 export default async function ProductDetail({params} : {params: {id: string}}) {
     const id = params.id
@@ -27,6 +28,8 @@ export default async function ProductDetail({params} : {params: {id: string}}) {
     <div>
       {!product && <span>Item Not Found</span>}
       {product && (
+        <div className="flex">
+
         <Card className="w-[350px] h-auto">
           <CardHeader>
             <CardTitle>{product.name}</CardTitle>
@@ -45,6 +48,8 @@ export default async function ProductDetail({params} : {params: {id: string}}) {
             <Button variant={"destructive"}>Delete</Button>
           </CardFooter>
         </Card>
+        <ProductForm product={product}/>
+        </div>
       )}
     </div>
   )
