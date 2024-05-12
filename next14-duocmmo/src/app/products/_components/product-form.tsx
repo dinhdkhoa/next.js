@@ -19,11 +19,13 @@ import Image from "next/image"
 import { useRef, useState } from "react"
 import { toast } from "sonner"
 import addProductsAPI from "../products.api"
+import { useRouter } from "next/navigation"
 
 export function ProductForm({product}: { product?: ProductDetailType }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const inputRef = useRef<HTMLInputElement | null>(null)
   const [file, setFile] = useState<File | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const router = useRouter()
   const form = useForm<CreateProductBodyType>({
     resolver: zodResolver(CreateProductBody),
     defaultValues: {
@@ -41,6 +43,8 @@ export function ProductForm({product}: { product?: ProductDetailType }) {
       await updateProduct(values)
     } else {
       await addProduct(values)
+      router.push('/products')
+      router.refresh()
     }
   }
 

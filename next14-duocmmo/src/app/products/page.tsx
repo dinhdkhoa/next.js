@@ -11,6 +11,7 @@ import addProductsAPI from "./products.api"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { DeleteProduct } from "./_components/delete-product"
 
 export default async function ProductsPage() {
   const res = await addProductsAPI.getProductList()
@@ -44,7 +45,7 @@ export default async function ProductsPage() {
                 <Link href={`products/${product.id}`}>
                   <Button variant={"outline"}>Edit</Button>
                 </Link>
-                <Button variant={"destructive"}>Delete</Button>
+                <DeleteProduct productName={product.name} id={product.id}/>
               </CardFooter>
             </Card>
           ))}

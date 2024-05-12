@@ -15,6 +15,7 @@ export default function ButtonLogout() {
       if (result) {
         toast.success(result.payload.message)
         router.push("/login")
+        router.refresh()
       }
     } catch (error) {
       handleApiError(error)

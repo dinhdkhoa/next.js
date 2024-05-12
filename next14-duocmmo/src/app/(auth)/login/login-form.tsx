@@ -49,6 +49,7 @@ export function LoginForm() {
       await loginAPI.setToken({sessionToken: resp.payload.data.token, expiresAt: resp.payload.data.expiresAt})
 
       router.push('/me')
+      router.refresh()
     } catch (error: any) {
       handleApiError(error, form.setError)
     } finally {

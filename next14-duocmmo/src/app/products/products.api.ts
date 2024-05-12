@@ -12,6 +12,7 @@ const addProductsAPI = {
     getProductList: () => http.get<ProductListResType>('products', { cache: "no-cache" }),
     getProductDetail: (id: string) => http.get<ProductResType>(`products/${id}`, { cache: "no-cache" }),
     updateProduct: (id: number, body: CreateProductBodyType) => http.put<ProductResType>(`products/${id}`, body),
+    deleteProduct: (id: number) => http.delete<{message: string}>(`products/${id}`),
     
 }
 
