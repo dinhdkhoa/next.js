@@ -12,7 +12,7 @@ export default function SlideSession() {
     const interval = setInterval(async () => {
       const currentTime = new Date()
       const expiresTimeFromLS = localStorage.getItem("expiresAt")
-      if(!expiresTimeFromLS) {
+      if (!expiresTimeFromLS) {
         localStorage.removeItem("expiresAt")
         return null
       }
@@ -30,6 +30,6 @@ export default function SlideSession() {
     }, 1000 * 60 * 60)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [router])
   return null
 }

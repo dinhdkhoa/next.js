@@ -18,9 +18,9 @@ import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import loginAPI from "./login.api"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 
-export function LoginForm() {
+function LoginFormComponent() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()
   const form = useForm<LoginBodyType>({
@@ -32,11 +32,11 @@ export function LoginForm() {
   })
   const params = useSearchParams()
 
-    useEffect(() => {
-      if (params.get("sessionExpired")) {
-        toast.error("Expired Session")
-      }
-    }, [])
+  useEffect(() => {
+    if (params.get("sessionExpired")) {
+      toast.error("Expired Session")
+    }
+  }, [params])
 
   // 2. Define a submit handler.
   async function onSubmit(values: LoginBodyType) {
@@ -46,9 +46,12 @@ export function LoginForm() {
       const resp = await loginAPI.login(values)
       toast.success(resp.payload.message)
 
-      await loginAPI.setToken({sessionToken: resp.payload.data.token, expiresAt: resp.payload.data.expiresAt})
+      await loginAPI.setToken({
+        sessionToken: resp.payload.data.token,
+        expiresAt: resp.payload.data.expiresAt
+      })
 
-      router.push('/me')
+      router.push("/me")
       router.refresh()
     } catch (error: any) {
       handleApiError(error, form.setError)
@@ -98,5 +101,13 @@ export function LoginForm() {
         </Button>
       </form>
     </Form>
+  )
+}
+
+export default function LoginForm() {
+  return (
+    <Suspense>
+      <LoginFormComponent /> 
+    </Suspense>
   )
 }

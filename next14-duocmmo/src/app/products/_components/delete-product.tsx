@@ -38,7 +38,7 @@ export function DeleteProduct({ productName, id }: { productName: string, id : n
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Data</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{productName}"? This will
+            Are you sure you want to delete &quot{productName}&quot? This will
             permanently delete this data!
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -50,3 +50,4 @@ export function DeleteProduct({ productName, id }: { productName: string, id : n
     </AlertDialog>
   )
 }
+ 
