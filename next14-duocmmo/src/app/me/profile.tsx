@@ -1,19 +1,16 @@
 "use client"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import meAPI from "./me.api"
-import { clientSessionToken } from "@/lib/https"
+import { AccountResType } from "@/schemaValidations/account.schema"
 
 export default function Profile() {
-
+  let [user, setUser] = useState<AccountResType["data"] | null>(null)
   useEffect(() => {
     const callAPI = async () => {
       const result = await meAPI.meClient()
+      setUser(result.payload.data)
     }
     callAPI()
   }, [])
-  return (
-    <div>
-      Client Component ${clientSessionToken.value}
-    </div>
-  )
+  return <div>Client Component ${user?.name}</div>
 }

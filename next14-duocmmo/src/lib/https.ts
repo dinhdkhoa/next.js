@@ -20,7 +20,7 @@ export class HttpError extends Error {
     status: number
     payload: {
         message: string,
-        [key: string] :any
+        [key: string]: any
     }
 
     constructor({ status, payload }: { status: number, payload: any }) {
@@ -44,12 +44,12 @@ export class FormError extends HttpError {
 class SessionToken {
     private token = ''
     private _expiresAt = ''
-    get value() { 
+    get value() {
         return this.token
     }
     set value(token: string) {
         // Nếu gọi method này ở server thì sẽ bị lỗi
-        if (!isClient()) {
+        if (!isClient) {
             throw new Error('Cannot set token on server side')
         }
         this.token = token
@@ -60,11 +60,11 @@ class SessionToken {
     }
     set expiresAt(expireAt: string) {
         // Nếu gọi method này ở server thì sẽ bị lỗi
-        if (!isClient()) {
+        if (!isClient) {
             throw new Error('Cannot set _expiresAt on server side')
         }
         this._expiresAt = expireAt
- }
+    }
 
 }
 /**
@@ -74,18 +74,23 @@ class SessionToken {
 export const clientSessionToken = new SessionToken()
 
 const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomRequest | undefined) => {
-    const body = options?.body ? (isFormData(options.body) ? options.body : JSON.stringify(options.body)) : undefined
-    
-    const baseHeader = isFormData(body) ? {
-        Authorization: clientSessionToken.value
-            ? `Bearer ${clientSessionToken.value}`
-            : ''
-    } : {
-        'Content-Type': 'application/json',
-        Authorization: clientSessionToken.value
-            ? `Bearer ${clientSessionToken.value}`
-            : ''
+    let body: BodyInit | undefined = undefined
+    const sesssionToken = isClient ? localStorage.getItem('sessionToken') : ''
+    const baseHeader: HeadersInit = {
+        Authorization: sesssionToken ? `Bearer ${sesssionToken}` : ''
     }
+
+    if (options?.body) {
+        if (isFormData(options.body)) {
+            body = options.body
+            baseHeader
+        } else {
+            body = options?.body ? JSON.stringify(options.body) : undefined
+            baseHeader['Content-Type'] = 'application/json'
+        }
+    }
+
+
 
     //Nếu không có options.baseUrl (hoặc = undefined) thì lấy gọi đến env 
     //Còn nếu '' thì gọi nextjs server hoặc gọi đến giá trị của baseUrl
@@ -95,7 +100,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     const res = await fetch(fullURL, {
         ...options,
         headers: {
-            ...baseHeader as any,
+            ...baseHeader,
             ...options?.headers,
         },
         body,
@@ -111,13 +116,13 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     //interceptors 
 
     if (!res.ok) {
-        if (res.status == FORM_ERROR_STATUS){
+        if (res.status == FORM_ERROR_STATUS) {
             throw new FormError({
                 status: 422,
                 payload: data.payload as FormErrorPayload
             })
         } else if (res.status == UNAUTHORIZED_ERROR_STATUS) {
-            if (isClient()) {
+            if (isClient) {
                 await handleUnthorizedResponseOnClient(baseHeader as any)
             } else {
                 const paramSessionToken = (options?.headers as any)?.Authorization.split('Bearer ').pop() as string
@@ -128,43 +133,43 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
         }
     }
 
-    if(isClient()){
+    if (isClient) {
         if (url === 'auth/login' || url === 'auth/register') {
-            clientSessionToken.value = (payload as LoginResType).data.token;
-            clientSessionToken.expiresAt = (payload as LoginResType).data.expiresAt;
+            localStorage.setItem('sessionToken', (payload as LoginResType).data.token);
+            localStorage.setItem('expiresAt', (payload as LoginResType).data.expiresAt);
         } else if (url === 'auth/logout') {
-            clientSessionToken.value = '';
-            clientSessionToken.expiresAt = new Date().toUTCString()
+            localStorage.removeItem('sessionToken');
+            localStorage.removeItem('expiresAt');
         }
     }
 
     return data
 }
 
-const isClient = (): boolean => {
-    return typeof window !== 'undefined'
-}
+const isClient = typeof window !== 'undefined'
 
-const isFormData = (body: BodyInit | null | undefined ) => {
+
+const isFormData = (body: BodyInit | undefined | null) => {
     return body && body instanceof FormData
 }
 
-const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefined) : Promise<void | string> => {
-   // handle 401 on client
-        await fetch('api/auth/logout', 
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    sessionExpired: true
-                }),
-                headers: {
-                    ...baseHeader
-                }
+const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefined): Promise<void | string> => {
+    // handle 401 on client
+    await fetch('api/auth/logout',
+        {
+            method: 'POST',
+            body: JSON.stringify({
+                sessionExpired: true
+            }),
+            headers: {
+                ...baseHeader
             }
-        )
-        clientSessionToken.value = '';
-        clientSessionToken.expiresAt = '';
-        location.href = '/login?sessionExpired=true'
+        }
+    )
+    localStorage.removeItem('sessionToken');
+    localStorage.removeItem('expiresAt');
+
+    location.href = '/login?sessionExpired=true'
 }
 
 const http = {
