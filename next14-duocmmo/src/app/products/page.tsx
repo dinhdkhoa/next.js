@@ -16,7 +16,7 @@ import { cookies } from "next/headers"
 
 export default async function ProductsPage() {
   const cookiesStore = cookies()
-  const isAuthenticated = cookiesStore.get("sessionToken")?.value   ? true : false
+  const isAuthenticated = cookiesStore.get("sessionToken")?.value ? true : false
   const res = await addProductsAPI.getProductList()
   const productList = res.payload.data
 
@@ -26,7 +26,7 @@ export default async function ProductsPage() {
         <Button variant={"outline"}>Add New Products</Button>
       </Link>
 
-      <div className=" flex gap-2 ">  
+      <div className=" flex gap-2 ">
         {productList &&
           productList.length > 0 &&
           productList.map((product) => (
@@ -36,18 +36,20 @@ export default async function ProductsPage() {
                 <CardDescription>{product.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Image
-                  src={product.image}
-                  width={180}
-                  height={180}
-                  alt={product.name}
-                />
+                <Link href={`products/${product.id}`}>
+                  <Image
+                    src={product.image}
+                    width={180}
+                    height={180}
+                    alt={product.name}
+                  />
+                </Link>
               </CardContent>
               <CardFooter>
                 <span className="mr-2">{product.price}</span>
                 {isAuthenticated && (
                   <>
-                    <Link href={`products/${product.id}`}>
+                    <Link href={`products/edit/${product.id}`} >
                       <Button variant={"outline"}>Edit</Button>
                     </Link>
                     <DeleteProduct productName={product.name} id={product.id} />

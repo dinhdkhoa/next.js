@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
     const {pathname} = request.nextUrl
     const  sessionToken = request.cookies.get('sessionToken')
 
-    if(privatePath.some(path => path.startsWith(pathname)) && !sessionToken){
+    if ((privatePath.some(path => path.startsWith(pathname)) || pathname.includes('/edit') || pathname.includes('/add')) && !sessionToken){
         return NextResponse.redirect(new URL(`/login/?returnUrl=${pathname}`, request.url))
     }
     if (authPaths.some(path => path.startsWith(pathname)) && sessionToken){
