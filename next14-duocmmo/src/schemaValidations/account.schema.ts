@@ -12,6 +12,7 @@ export const AccountRes = z
   .strict()
 
 export type AccountResType = z.TypeOf<typeof AccountRes>
+export type AccountType = AccountResType['data']
 
 export const UpdateMeBody = z.object({
   name: z.string().trim().min(2).max(256)

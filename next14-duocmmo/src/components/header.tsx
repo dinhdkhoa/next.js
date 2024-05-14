@@ -6,22 +6,9 @@ import { cookies } from "next/headers"
 import loginAPI from "@/app/(auth)/login/login.api"
 import meAPI from "@/app/me/me.api"
 import { handleApiError } from "@/lib/utils"
+import { AccountType } from "@/schemaValidations/account.schema"
 
-export default async function Header() {
-  const cookieStore = cookies()
-  const sessionToken = cookieStore.get("sessionToken")?.value
-  let user = null
-
-  if(sessionToken) {
-    try {
-      const checkUser = await meAPI.me(sessionToken)
-      user = checkUser.payload.data
-    } catch (error) {
-      handleApiError(error)
-    }
-    
-  }
-
+export default async function Header({user}: { user: AccountType | null }) { // thay vì truyền props user có thể dùng cookies()
   return (
     <nav className="flex w-full">
       <ul className="flex gap-3">

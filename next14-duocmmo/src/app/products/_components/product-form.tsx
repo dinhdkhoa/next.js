@@ -44,8 +44,8 @@ export function ProductForm({product}: { product?: ProductDetailType }) {
     } else {
       await addProduct(values)
       router.push('/products')
-      router.refresh()
     }
+    router.refresh()
   }
 
   const updateProduct =  async (values: CreateProductBodyType) => {
