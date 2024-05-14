@@ -13,6 +13,11 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { DeleteProduct } from "./_components/delete-product"
 import { cookies } from "next/headers"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: 'Products',
+}
 
 export default async function ProductsPage() {
   const cookiesStore = cookies()

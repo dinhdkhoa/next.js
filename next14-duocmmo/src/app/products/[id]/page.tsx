@@ -1,5 +1,5 @@
-import React from 'react'
-import addProductsAPI from '../products.api'
+import React, { cache } from "react"
+import addProductsAPI from "../products.api"
 import {
   Card,
   CardContent,
@@ -8,24 +8,40 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { ProductDetailType, ProductResType } from '@/schemaValidations/product.schema'
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { ProductForm } from '../_components/product-form'
-import { cookies } from 'next/headers'
+import {
+  ProductDetailType,
+  ProductResType
+} from "@/schemaValidations/product.schema"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { ProductForm } from "../_components/product-form"
+import { cookies } from "next/headers"
 
-export default async function ProductDetail({params} : {params: {id: string}}) {
-    const id = params.id
-    let product: ProductDetailType | null = null
-    const isAuthen = cookies().get("sessionToken")?.value ? true : false
-    try {
-        const res = await addProductsAPI.getProductDetail(id)
-        if(res){
-            product = res.payload.data
-        }
-    } catch (error) {
-        
+const getProductDetail = cache(addProductsAPI.getProductDetail)
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const id = params.id
+  const product = await getProductDetail(id)
+  const { name } = product.payload.data
+  return {
+    title: `${name}`
+  }
+}
+
+export default async function ProductDetail({
+  params
+}: {
+  params: { id: string }
+}) {
+  const id = params.id
+  let product: ProductDetailType | null = null
+  const isAuthen = cookies().get("sessionToken")?.value ? true : false
+  try {
+    const res = await getProductDetail(id)
+    if (res) {
+      product = res.payload.data
     }
+  } catch (error) {}
   return (
     <div>
       {!product && <span>Item Not Found</span>}
