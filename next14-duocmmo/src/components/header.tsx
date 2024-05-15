@@ -11,7 +11,7 @@ import { AccountType } from "@/schemaValidations/account.schema"
 export default async function Header({user}: { user: AccountType | null }) { // thay vì truyền props user có thể dùng cookies()
   return (
     <nav className="flex w-full">
-      <ul className="flex gap-3">
+      {/* <ul className="flex gap-3">
         <li>
           <Link href={"/products"}>Products</Link>
         </li>
@@ -36,7 +36,7 @@ export default async function Header({user}: { user: AccountType | null }) { // 
             </li>
           </>
         )}
-      </ul>
+      </ul> */}
       <ModeToggle />
     </nav>
   )
