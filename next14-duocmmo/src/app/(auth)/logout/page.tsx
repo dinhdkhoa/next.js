@@ -13,7 +13,7 @@ const LogoutComponent = () =>  {
   useEffect(() => {
     const controller = new AbortController()
     const signal = controller.signal
-    if (sessionToken === localStorage.getItem('sessionToken')) {
+    if (sessionToken === JSON.parse(localStorage.getItem('sessionToken') || '')) {
       logoutAPI
         .logoutClient(true, signal)
         .then((res) => {

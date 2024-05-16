@@ -16,12 +16,12 @@ export default function SlideSession() {
         localStorage.removeItem("expiresAt")
         return null
       }
-      const expiresTime = new Date(expiresTimeFromLS)
+      const expiresTime = new Date(JSON.parse(expiresTimeFromLS))
       if (differenceInHours(expiresTime, currentTime) < 1) {
         try {
           const result = await slideSessionAPI.slideSessionClient()
           if (result) {
-            localStorage.setItem("expiresAt", result.payload.data.expiresAt)
+            localStorage.setItem("expiresAt", JSON.stringify(result.payload.data.expiresAt))
           }
         } catch (error) {
           router.push("/login?sessionExpired=true")

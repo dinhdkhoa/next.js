@@ -135,8 +135,8 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
 
     if (isClient) {
         if (url === 'auth/login' || url === 'auth/register') {
-            localStorage.setItem('sessionToken', (payload as LoginResType).data.token);
-            localStorage.setItem('expiresAt', (payload as LoginResType).data.expiresAt);
+            localStorage.setItem('sessionToken', JSON.stringify((payload as LoginResType).data.token));
+            localStorage.setItem('expiresAt', JSON.stringify((payload as LoginResType).data.expiresAt));
         } else if (url === 'auth/logout') {
             localStorage.removeItem('sessionToken');
             localStorage.removeItem('expiresAt');
